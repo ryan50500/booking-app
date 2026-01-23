@@ -1,0 +1,14 @@
+{
+  "name": "Doctor Booking App",
+  "forwardPorts": [3000, 5000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Frontend Dev Server",
+      "onAutoForward": "openBrowser"
+    },
+    "5000": {
+      "label": "Backend AdsaI Server",
+      "onAutoForward": "notify"
+    }
+  }
+}

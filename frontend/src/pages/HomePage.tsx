@@ -1,6 +1,15 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const HomePage = () => {
+
+const unusedVariable = 42; // This variable is intentionally unused to demonstrate code completion.
+
+const [count, setCount] = useState(0);
+useEffect(() => {
+  console.log(count);
+}, []);
+
   return (
     <div className="bg-gray-50">
       {/* Hero Section */}

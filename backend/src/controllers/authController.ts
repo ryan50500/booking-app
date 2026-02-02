@@ -1,197 +1,109 @@
 import { Request, Response } from "express";
-import { supabase } from "../config/database";
-
-const COOKIE_OPTIONS = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production", // HTTPS only in production
-  sameSite:
-    process.env.NODE_ENV === "production"
-      ? ("strict" as const)
-      : ("lax" as const),
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  path: "/",
-};
+// import { supabase } from "../config/database"; // TODO: Uncomment when Supabase is set up
 
 /**
- * Register a new user
+ * ============================================================================
+ * AUTH CONTROLLER - Session Broker Pattern
+ * ============================================================================
+ *
+ * What this file does:
+ * - Acts as a "middleman" between your frontend and Supabase Auth
+ * - Does NOT handle passwords or create JWTs itself
+ * - Calls Supabase to do the authentication
+ * - Stores the JWT token from Supabase in an HTTP-only cookie (secure!)
+ *
+ * Why HTTP-only cookies?
+ * - JavaScript cannot access them (prevents XSS attacks)
+ * - Browser sends them automatically with every request
+ * - More secure than storing tokens in localStorage
+ *
+ * TODO: Before using these functions, you need to:
+ * 1. Create a Supabase account at https://supabase.com
+ * 2. Create a new project
+ * 3. Add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to your .env file
+ * 4. Uncomment the supabase import above
+ * ============================================================================
+ */
+
+/**
+ * REGISTER - Create a new user account
  * POST /api/auth/register
  *
- * Session Broker Pattern:
- * - Calls Supabase Auth (does NOT handle passwords itself)
- * - Receives JWT from Supabase
- * - Stores token in HTTP-only cookie
+ * What happens:
+ * 1. Frontend sends: { email, password, name, role }
+ * 2. Backend calls Supabase: "Hey Supabase, create this user"
+ * 3. Supabase creates user and returns a JWT token
+ * 4. Backend stores JWT in HTTP-only cookie
+ * 5. Frontend receives success message (but never sees the token!)
  */
 export const register = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { email, password, name, role } = req.body;
+  // ✅ Log the request for learning/debugging
+  console.log("Register endpoint called with:", req.body);
 
-    // Validate input
-    if (!email || !password) {
-      res.status(400).json({ error: "Email and password are required" });
-      return;
-    }
-
-    // Create user with Supabase Auth (NOT custom auth)
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name,
-          role: role || "patient", // Default to patient role
-        },
-      },
-    });
-
-    if (error) {
-      res.status(400).json({ error: error.message });
-      return;
-    }
-
-    if (!data.session) {
-      // Email confirmation required
-      res.status(200).json({
-        message:
-          "Registration successful. Please check your email to confirm your account.",
-      });
-      return;
-    }
-
-    // Set HTTP-only cookies (secure token storage)
-    res.cookie("sb-access-token", data.session.access_token, COOKIE_OPTIONS);
-    res.cookie("sb-refresh-token", data.session.refresh_token, COOKIE_OPTIONS);
-
-    res.status(201).json({
-      message: "Registration successful",
-      user: {
-        id: data.user?.id,
-        email: data.user?.email,
-        name: data.user?.user_metadata?.name,
-        role: data.user?.user_metadata?.role,
-      },
-    });
-  } catch (error) {
-    console.error("Registration error:", error);
-    res.status(500).json({ error: "Registration failed" });
-  }
+  // TODO: Implement when Supabase is set up
+  res.status(501).json({
+    message: "Registration endpoint - not yet implemented",
+    todo: "Set up Supabase account and add credentials to .env",
+  });
 };
 
 /**
- * Login user
+ * LOGIN - Authenticate existing user
  * POST /api/auth/login
  *
- * Session Broker Pattern:
- * - Calls Supabase Auth to verify credentials
- * - Receives JWT from Supabase
- * - Stores token in HTTP-only cookie
+ * What happens:
+ * 1. Frontend sends: { email, password }
+ * 2. Backend asks Supabase: "Is this password correct?"
+ * 3. Supabase verifies and returns JWT token
+ * 4. Backend stores JWT in HTTP-only cookie
+ * 5. Frontend receives success message
+ *
+ * The frontend never touches the token - it's safely stored in a cookie!
  */
 export const login = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { email, password } = req.body;
-
-    // Validate input
-    if (!email || !password) {
-      res.status(400).json({ error: "Email and password are required" });
-      return;
-    }
-
-    // Sign in with Supabase (NOT custom password verification)
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      res.status(401).json({ error: "Invalid credentials" });
-      return;
-    }
-
-    if (!data.session) {
-      res.status(401).json({ error: "Login failed" });
-      return;
-    }
-
-    // Set HTTP-only cookies (secure token storage)
-    res.cookie("sb-access-token", data.session.access_token, COOKIE_OPTIONS);
-    res.cookie("sb-refresh-token", data.session.refresh_token, COOKIE_OPTIONS);
-
-    res.status(200).json({
-      message: "Login successful",
-      user: {
-        id: data.user.id,
-        email: data.user.email,
-        name: data.user.user_metadata?.name,
-        role: data.user.user_metadata?.role,
-      },
-    });
-  } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).json({ error: "Login failed" });
-  }
+  // TODO: Implement when Supabase is set up
+  res.status(501).json({
+    message: "Login endpoint - not yet implemented",
+    todo: "Set up Supabase account and add credentials to .env",
+  });
 };
 
 /**
- * Logout user
+ * LOGOUT - Clear user session
  * POST /api/auth/logout
  *
- * Clears HTTP-only cookies
+ * What happens:
+ * 1. Frontend sends logout request
+ * 2. Backend tells Supabase: "This user is logging out"
+ * 3. Backend clears the HTTP-only cookies
+ * 4. User is now logged out
  */
 export const logout = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const token = req.cookies?.["sb-access-token"];
+  // For now, just clear cookies (no Supabase needed)
+  res.clearCookie("sb-access-token");
+  res.clearCookie("sb-refresh-token");
 
-    if (token) {
-      // Sign out from Supabase
-      await supabase.auth.signOut();
-    }
-
-    // Clear cookies
-    res.clearCookie("sb-access-token");
-    res.clearCookie("sb-refresh-token");
-
-    res.status(200).json({ message: "Logout successful" });
-  } catch (error) {
-    console.error("Logout error:", error);
-    res.status(500).json({ error: "Logout failed" });
-  }
+  res.status(200).json({ message: "Logout successful" });
 };
 
 /**
- * Get current user profile
+ * GET PROFILE - Get current logged-in user info
  * GET /api/auth/profile
  *
- * Verifies Supabase JWT from cookie
+ * What happens:
+ * 1. Browser automatically sends cookie with request
+ * 2. Backend extracts JWT from cookie
+ * 3. Backend asks Supabase: "Is this token valid? Who is this user?"
+ * 4. Supabase returns user info
+ * 5. Backend sends user info to frontend
  */
 export const getProfile = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  try {
-    const token = req.cookies?.["sb-access-token"];
-
-    if (!token) {
-      res.status(401).json({ error: "Not authenticated" });
-      return;
-    }
-
-    // Verify with Supabase (NOT custom JWT verification)
-    const { data, error } = await supabase.auth.getUser(token);
-
-    if (error || !data.user) {
-      res.status(401).json({ error: "Invalid token" });
-      return;
-    }
-
-    res.status(200).json({
-      user: {
-        id: data.user.id,
-        email: data.user.email,
-        name: data.user.user_metadata?.name,
-        role: data.user.user_metadata?.role,
-      },
-    });
-  } catch (error) {
-    console.error("Get profile error:", error);
-    res.status(500).json({ error: "Failed to get profile" });
-  }
+  // TODO: Implement when Supabase is set up
+  res.status(501).json({
+    message: "Profile endpoint - not yet implemented",
+    todo: "Set up Supabase account and add credentials to .env",
+  });
 };

@@ -6,6 +6,23 @@ import { Request, Response } from "express";
  * AUTH CONTROLLER - Session Broker Pattern
  * ============================================================================
  *
+ * RELATIONSHIP TO OTHER FILES:
+ *
+ * authRoutes.ts (routes/authRoutes.ts)
+ *   → Defines the URL endpoints and connects them to these functions
+ *   → Example: router.post("/login", login) creates POST /api/auth/login
+ *
+ * authController.ts (THIS FILE)
+ *   → Contains the actual logic that runs when those endpoints are hit
+ *   → Calls Supabase, sets cookies, sends responses
+ *
+ * auth.ts (middleware/auth.ts)
+ *   → Security checkpoint used BEFORE protected routes
+ *   → Verifies token is valid before allowing access
+ *   → Different from getProfile() which is a destination endpoint
+ *
+ * ============================================================================
+ *
  * What this file does:
  * - Acts as a "middleman" between your frontend and Supabase Auth
  * - Does NOT handle passwords or create JWTs itself
@@ -89,6 +106,10 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
 /**
  * GET PROFILE - Get current logged-in user info
  * GET /api/auth/profile
+ *
+ * NOTE: This is different from middleware/auth.ts verifyToken()
+ * - verifyToken() = Security checkpoint (used before other routes)
+ * - getProfile() = Endpoint destination (returns user data)
  *
  * What happens:
  * 1. Browser automatically sends cookie with request

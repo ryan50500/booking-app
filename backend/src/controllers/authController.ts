@@ -13,7 +13,17 @@ import { supabase } from "../config/database";
  * ✅ 4. Uncomment the supabase import above
  *
  * NEXT STEPS:
- * ⬜ 5. Enable Email Auth in Supabase (Authentication > Providers > Email)
+ * ⬜ 5. Enable Email Auth in Supabase
+ *       Steps:
+ *       a) Go to https://supabase.com and log into your project
+ *       b) Click "Authentication" in the left sidebar
+ *       c) Click "Providers" tab at the top
+ *       d) Find "Email" in the list (usually already enabled by default)
+ *       e) If disabled, click to enable it
+ *       f) Optional: Configure email templates (Confirm signup, Reset password, etc.)
+ *       g) Optional: Under "Email Auth" settings, you can:
+ *          - Enable/disable email confirmations (for dev, disable is easier)
+ *          - Set password requirements
  *       Why: Allows users to register/login with email & password
  * 
  * ⬜ 6. Implement the register() function below

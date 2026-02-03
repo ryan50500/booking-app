@@ -30,6 +30,10 @@ import { supabase } from "../config/database";
  * 
  * ⬜ 10. Set up cookie options for production
  *       Why: Add secure flags (HTTPS-only, strict SameSite) for deployed app
+ * 
+ * ⬜ 11. Implement auth middleware (middleware/auth.ts)
+ *       Why: Protect routes that require authentication (appointments, doctors, getProfile)
+ *       Note: register() and login() stay public - middleware is for OTHER routes
  *
  * ============================================================================
  *

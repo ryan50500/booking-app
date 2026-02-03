@@ -1,25 +1,35 @@
 import { Request, Response } from "express";
-// import { supabase } from "../config/database"; // TODO: Uncomment when Supabase is set up
+import { supabase } from "../config/database";
 
 /**
  * ============================================================================
  * AUTH CONTROLLER - Session Broker Pattern
  * ============================================================================
  *
- * RELATIONSHIP TO OTHER FILES:
+ * SETUP CHECKLIST:
+ * ✅ 1. Create a Supabase account at https://supabase.com
+ * ✅ 2. Create a new project
+ * ✅ 3. Add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to your .env file
+ * ✅ 4. Uncomment the supabase import above
  *
- * authRoutes.ts (routes/authRoutes.ts)
- *   → Defines the URL endpoints and connects them to these functions
- *   → Example: router.post("/login", login) creates POST /api/auth/login
- *
- * authController.ts (THIS FILE)
- *   → Contains the actual logic that runs when those endpoints are hit
- *   → Calls Supabase, sets cookies, sends responses
- *
- * auth.ts (middleware/auth.ts)
- *   → Security checkpoint used BEFORE protected routes
- *   → Verifies token is valid before allowing access
- *   → Different from getProfile() which is a destination endpoint
+ * NEXT STEPS:
+ * ⬜ 5. Enable Email Auth in Supabase (Authentication > Providers > Email)
+ *       Why: Allows users to register/login with email & password
+ * 
+ * ⬜ 6. Implement the register() function below
+ *       Why: Let new users create accounts (calls Supabase, sets cookie)
+ * 
+ * ⬜ 7. Implement the login() function below
+ *       Why: Let existing users sign in (verifies credentials, sets cookie)
+ * 
+ * ⬜ 8. Test with Postman or your frontend
+ *       Why: Verify register/login work before building more features
+ * 
+ * ⬜ 9. Implement getProfile() function
+ *       Why: Let logged-in users fetch their account info
+ * 
+ * ⬜ 10. Set up cookie options for production
+ *       Why: Add secure flags (HTTPS-only, strict SameSite) for deployed app
  *
  * ============================================================================
  *
@@ -34,13 +44,7 @@ import { Request, Response } from "express";
  * - Browser sends them automatically with every request
  * - More secure than storing tokens in localStorage
  *
- * TODO: Before using these functions, you need to:
- * 1. Create a Supabase account at https://supabase.com
- * 2. Create a new project
- * 3. Add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to your .env file
- * 4. Uncomment the supabase import above
- * ============================================================================
- */
+
 
 /**
  * REGISTER - Create a new user account

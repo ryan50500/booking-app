@@ -5,6 +5,18 @@ import { supabase } from "../config/database";
  * ============================================================================
  * AUTH CONTROLLER - Session Broker Pattern
  * ============================================================================
+ * 
+ * What this file does:
+ * - Acts as a "middleman" between your frontend and Supabase Auth
+ * - Does NOT handle passwords or create JWTs itself
+ * - Calls Supabase to do the authentication
+ * - Stores the JWT token from Supabase in an HTTP-only cookie (secure!)
+ *
+ * Why HTTP-only cookies?
+ * - JavaScript cannot access them (prevents XSS attacks)
+ * - Browser sends them automatically with every request
+ * - More secure than storing tokens in localStorage
+ *
  *
  * SETUP CHECKLIST:
  * ✅ 1. Create a Supabase account at https://supabase.com
@@ -13,7 +25,7 @@ import { supabase } from "../config/database";
  * ✅ 4. Uncomment the supabase import above
  *
  * NEXT STEPS:
- * ⬜ 5. Enable Email Auth in Supabase
+ * ✅ 5. Enable Email Auth in Supabase
  *       Steps:
  *       a) Go to https://supabase.com and log into your project
  *       b) Click "Authentication" in the left sidebar
@@ -47,24 +59,12 @@ import { supabase } from "../config/database";
  *
  * ============================================================================
  *
- * What this file does:
- * - Acts as a "middleman" between your frontend and Supabase Auth
- * - Does NOT handle passwords or create JWTs itself
- * - Calls Supabase to do the authentication
- * - Stores the JWT token from Supabase in an HTTP-only cookie (secure!)
- *
- * Why HTTP-only cookies?
- * - JavaScript cannot access them (prevents XSS attacks)
- * - Browser sends them automatically with every request
- * - More secure than storing tokens in localStorage
- *
-
 
 /**
- * REGISTER - Create a new user account
+ * REGISTER 📝 - Create a new user account
  * POST /api/auth/register
  *
- * What happens:
+ * 🔧 What happens 🔧:
  * 1. Frontend sends: { email, password, name, role }
  * 2. Backend calls Supabase: "Hey Supabase, create this user"
  * 3. Supabase creates user and returns a JWT token
@@ -83,10 +83,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
- * LOGIN - Authenticate existing user
+ * LOGIN 🔐 - Authenticate existing user
  * POST /api/auth/login
  *
- * What happens:
+ * 🔧 What happens 🔧:
  * 1. Frontend sends: { email, password }
  * 2. Backend asks Supabase: "Is this password correct?"
  * 3. Supabase verifies and returns JWT token
@@ -104,10 +104,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
- * LOGOUT - Clear user session
+ * LOGOUT 🚪 - Clear user session
  * POST /api/auth/logout
  *
- * What happens:
+ * 🔧 What happens 🔧:
  * 1. Frontend sends logout request
  * 2. Backend tells Supabase: "This user is logging out"
  * 3. Backend clears the HTTP-only cookies
@@ -122,14 +122,14 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
- * GET PROFILE - Get current logged-in user info
+ * GET PROFILE 👤 - Get current logged-in user info
  * GET /api/auth/profile
  *
  * NOTE: This is different from middleware/auth.ts verifyToken()
  * - verifyToken() = Security checkpoint (used before other routes)
  * - getProfile() = Endpoint destination (returns user data)
  *
- * What happens:
+ * 🔧 What happens 🔧:
  * 1. Browser automatically sends cookie with request
  * 2. Backend extracts JWT from cookie
  * 3. Backend asks Supabase: "Is this token valid? Who is this user?"

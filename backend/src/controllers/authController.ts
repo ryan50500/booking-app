@@ -26,17 +26,7 @@ import { supabase } from "../config/database";
  *
  * NEXT STEPS:
  * ✅ 5. Enable Email Auth in Supabase
- *       Steps:
- *       a) Go to https://supabase.com and log into your project
- *       b) Click "Authentication" in the left sidebar
- *       c) Click "Providers" tab at the top
- *       d) Find "Email" in the list (usually already enabled by default)
- *       e) If disabled, click to enable it
- *       f) Optional: Configure email templates (Confirm signup, Reset password, etc.)
- *       g) Optional: Under "Email Auth" settings, you can:
- *          - Enable/disable email confirmations (for dev, disable is easier)
- *          - Set password requirements
- *       Why: Allows users to register/login with email & password
+ *      Why: Allow users to register/login with email and password (no OAuth for now)
  * 
  * ⬜ 6. Implement the register() function below
  *       Why: Let new users create accounts (calls Supabase, sets cookie)
@@ -72,14 +62,77 @@ import { supabase } from "../config/database";
  * 5. Frontend receives success message (but never sees the token!)
  */
 export const register = async (req: Request, res: Response): Promise<void> => {
-  // ✅ Log the request for learning/debugging
-  console.log("Register endpoint called with:", req.body);
+  try {
+    // ✅ Log the request for learning/debugging
+    console.log("Register endpoint called with:", req.body);
 
-  // TODO: Implement when Supabase is set up
-  res.status(501).json({
-    message: "Registration endpoint - not yet implemented",
-    todo: "Set up Supabase account and add credentials to .env",
-  });
+    // ============================================================
+    // STEP 1: EXTRACT DATA FROM REQUEST BODY
+    // ============================================================
+    // When frontend sends JSON like: { "email": "test@test.com", "password": "abc123", "name": "John" }
+    // This destructuring pulls out those specific properties
+    const { email, password, name, role } = req.body;
+
+    // ============================================================
+    // STEP 2: VALIDATE REQUIRED FIELDS
+    // ============================================================
+    // Check if any required field is missing, undefined, null, or empty string
+    // The || (OR) operator means "if ANY of these are falsy, the condition is true"
+    if (!email || !password || !name) {
+      // Send 400 Bad Request status (client sent invalid data)
+      res.status(400).json({
+        error: "Missing required fields",
+        message: "Email, password, and name are required",
+      });
+      return; // IMPORTANT: Stop execution here - don't continue
+    }
+
+    // ============================================================
+    // STEP 3: BASIC EMAIL FORMAT VALIDATION
+    // ============================================================
+    // Simple regex to check if email looks valid (has @ and a domain)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      res.status(400).json({
+        error: "Invalid email",
+        message: "Please provide a valid email address",
+      });
+      return;
+    }
+
+    // ============================================================
+    // STEP 4: PASSWORD LENGTH VALIDATION
+    // ============================================================
+    // Supabase requires minimum 6 characters by default
+    if (password.length < 6) {
+      res.status(400).json({
+        error: "Weak password",
+        message: "Password must be at least 6 characters long",
+      });
+      return;
+    }
+
+    // ✅ If we reach this point, all validation passed!
+    console.log("✅ Validation passed for:", email);
+
+    // ============================================================
+    // NEXT STEP: Call Supabase (we'll add this in the next step)
+    // ============================================================
+    res.status(501).json({
+      message: "Registration endpoint - validation works! Next: call Supabase",
+      receivedData: { email, name, role: role || "patient" },
+    });
+  } catch (error) {
+    // ============================================================
+    // CATCH BLOCK: Handles ANY unexpected errors
+    // ============================================================
+    // This prevents the entire server from crashing if something goes wrong
+    console.error("❌ Registration error:", error);
+    res.status(500).json({
+      error: "Server error",
+      message: "Failed to register user",
+    });
+  }
 };
 
 /**

@@ -1,11 +1,8 @@
-import { Request, Response } from "express";
-import { supabase } from "../config/database";
-
 /**
  * ============================================================================
  * AUTH CONTROLLER - Session Broker Pattern
  * ============================================================================
- * 
+ *
  * What this file does:
  * - Acts as a "middleman" between your frontend and Supabase Auth
  * - Does NOT handle passwords or create JWTs itself
@@ -27,28 +24,31 @@ import { supabase } from "../config/database";
  * NEXT STEPS:
  * ✅ 5. Enable Email Auth in Supabase
  *      Why: Allow users to register/login with email and password (no OAuth for now)
- * 
- * ⬜ 6. Implement the register() function below
- *       Why: Let new users create accounts (calls Supabase, sets cookie)
- * 
+ *
+ * ⚠️ 6. Review and understand the register() function below
+ *       Why: Learn how validation works, status codes, and error handling before calling Supabase
+ *
  * ⬜ 7. Implement the login() function below
  *       Why: Let existing users sign in (verifies credentials, sets cookie)
- * 
+ *
  * ⬜ 8. Test with Postman or your frontend
  *       Why: Verify register/login work before building more features
- * 
+ *
  * ⬜ 9. Implement getProfile() function
  *       Why: Let logged-in users fetch their account info
- * 
+ *
  * ⬜ 10. Set up cookie options for production
  *       Why: Add secure flags (HTTPS-only, strict SameSite) for deployed app
- * 
+ *
  * ⬜ 11. Implement auth middleware (middleware/auth.ts)
  *       Why: Protect routes that require authentication (appointments, doctors, getProfile)
  *       Note: register() and login() stay public - middleware is for OTHER routes
  *
  * ============================================================================
- *
+ */
+
+import { Request, Response } from "express";
+import { supabase } from "../config/database";
 
 /**
  * REGISTER 📝 - Create a new user account
@@ -69,30 +69,28 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // ============================================================
     // STEP 1: EXTRACT DATA FROM REQUEST BODY
     // ============================================================
-    // When frontend sends JSON like: { "email": "test@test.com", "password": "abc123", "name": "John" }
-    // This destructuring pulls out those specific properties
     const { email, password, name, role } = req.body;
 
     // ============================================================
     // STEP 2: VALIDATE REQUIRED FIELDS
     // ============================================================
-    // Check if any required field is missing, undefined, null, or empty string
-    // The || (OR) operator means "if ANY of these are falsy, the condition is true"
     if (!email || !password || !name) {
-      // Send 400 Bad Request status (client sent invalid data)
+      // NOTE: You can name these keys anything (error, message, errorType, etc.)
+      // NOTE: You can use any 4xx status code, but 400 = "Bad Request" is standard for validation errors
       res.status(400).json({
         error: "Missing required fields",
         message: "Email, password, and name are required",
       });
-      return; // IMPORTANT: Stop execution here - don't continue
+      return;
     }
 
     // ============================================================
     // STEP 3: BASIC EMAIL FORMAT VALIDATION
     // ============================================================
-    // Simple regex to check if email looks valid (has @ and a domain)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
+      // NOTE: Keys can be named anything - "error" and "message" is just our convention
+      // NOTE: 400 status means "client sent bad data" (vs 500 = "server broke")
       res.status(400).json({
         error: "Invalid email",
         message: "Please provide a valid email address",
@@ -103,8 +101,9 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // ============================================================
     // STEP 4: PASSWORD LENGTH VALIDATION
     // ============================================================
-    // Supabase requires minimum 6 characters by default
     if (password.length < 6) {
+      // NOTE: Consistency matters - use same key names across all endpoints
+      // NOTE: Status codes are semantic hints (400 = client error, not server error)
       res.status(400).json({
         error: "Weak password",
         message: "Password must be at least 6 characters long",
@@ -118,6 +117,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // ============================================================
     // NEXT STEP: Call Supabase (we'll add this in the next step)
     // ============================================================
+    // NOTE: 501 = "Not Implemented" - perfect for placeholder endpoints
+    // NOTE: JSON keys are flexible - could be "msg", "info", "status", etc.
     res.status(501).json({
       message: "Registration endpoint - validation works! Next: call Supabase",
       receivedData: { email, name, role: role || "patient" },
@@ -126,8 +127,9 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // ============================================================
     // CATCH BLOCK: Handles ANY unexpected errors
     // ============================================================
-    // This prevents the entire server from crashing if something goes wrong
     console.error("❌ Registration error:", error);
+    // NOTE: 500 = "Internal Server Error" - use when YOUR code breaks (not client's fault)
+    // NOTE: Could use keys like "errorType", "details", "errorMessage" - just be consistent!
     res.status(500).json({
       error: "Server error",
       message: "Failed to register user",
@@ -138,64 +140,44 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 /**
  * LOGIN 🔐 - Authenticate existing user
  * POST /api/auth/login
- *
- * 🔧 What happens 🔧:
- * 1. Frontend sends: { email, password }
- * 2. Backend asks Supabase: "Is this password correct?"
- * 3. Supabase verifies and returns JWT token
- * 4. Backend stores JWT in HTTP-only cookie
- * 5. Frontend receives success message
- *
- * The frontend never touches the token - it's safely stored in a cookie!
  */
 export const login = async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement when Supabase is set up
+  console.log("Login endpoint called");
+
+  // NOTE: 501 status code can be anything (200, 400, 418 "I'm a teapot"), but 501 means "not coded yet"
+  // NOTE: Response body keys are totally flexible - name them whatever makes sense!
   res.status(501).json({
     message: "Login endpoint - not yet implemented",
-    todo: "Set up Supabase account and add credentials to .env",
+  });
+};
+
+/**
+ * GET PROFILE 👤 - Fetch current user's profile
+ * GET /api/auth/profile
+ */
+export const getProfile = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  console.log("Get profile endpoint called");
+
+  // NOTE: Could use 503 (Service Unavailable) or 501 (Not Implemented) - they're just conventions
+  // NOTE: Could structure as { "data": null, "status": "pending" } - whatever your frontend expects!
+  res.status(501).json({
+    message: "Get profile endpoint - not yet implemented",
   });
 };
 
 /**
  * LOGOUT 🚪 - Clear user session
  * POST /api/auth/logout
- *
- * 🔧 What happens 🔧:
- * 1. Frontend sends logout request
- * 2. Backend tells Supabase: "This user is logging out"
- * 3. Backend clears the HTTP-only cookies
- * 4. User is now logged out
  */
 export const logout = async (req: Request, res: Response): Promise<void> => {
-  // For now, just clear cookies (no Supabase needed)
-  res.clearCookie("sb-access-token");
-  res.clearCookie("sb-refresh-token");
+  console.log("Logout endpoint called");
 
-  res.status(200).json({ message: "Logout successful" });
-};
-
-/**
- * GET PROFILE 👤 - Get current logged-in user info
- * GET /api/auth/profile
- *
- * NOTE: This is different from middleware/auth.ts verifyToken()
- * - verifyToken() = Security checkpoint (used before other routes)
- * - getProfile() = Endpoint destination (returns user data)
- *
- * 🔧 What happens 🔧:
- * 1. Browser automatically sends cookie with request
- * 2. Backend extracts JWT from cookie
- * 3. Backend asks Supabase: "Is this token valid? Who is this user?"
- * 4. Supabase returns user info
- * 5. Backend sends user info to frontend
- */
-export const getProfile = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  // TODO: Implement when Supabase is set up
+  // NOTE: Status codes are semantic (501 = "I haven't built this yet")
+  // NOTE: JSON body structure is YOUR choice - just keep it consistent across your API
   res.status(501).json({
-    message: "Profile endpoint - not yet implemented",
-    todo: "Set up Supabase account and add credentials to .env",
+    message: "Logout endpoint - not yet implemented",
   });
 };

@@ -25,22 +25,25 @@
  * ✅ 5. Enable Email Auth in Supabase
  *      Why: Allow users to register/login with email and password (no OAuth for now)
  *
- * ⚠️ 6. Review and understand the register() function below
- *       Why: Learn how validation works, status codes, and error handling before calling Supabase
+ * ✅ 6. Review and understand the register() function below
+ *       Why: Learn how validation works, status codes, and error handling before implementing the Supabase call
  *
- * ⬜ 7. Implement the login() function below
+ * ⬜ 7. Implement the Supabase call inside register()
+ *       Why: Actually create the user, get the session token, and move beyond the placeholder response
+ *
+ * ⬜ 8. Implement the login() function below
  *       Why: Let existing users sign in (verifies credentials, sets cookie)
  *
- * ⬜ 8. Test with Postman or your frontend
+ * ⬜ 9. Test with Postman or your frontend
  *       Why: Verify register/login work before building more features
  *
- * ⬜ 9. Implement getProfile() function
+ * ⬜ 10. Implement getProfile() function
  *       Why: Let logged-in users fetch their account info
  *
- * ⬜ 10. Set up cookie options for production
+ * ⬜ 11. Set up cookie options for production
  *       Why: Add secure flags (HTTPS-only, strict SameSite) for deployed app
  *
- * ⬜ 11. Implement auth middleware (middleware/auth.ts)
+ * ⬜ 12. Implement auth middleware (middleware/auth.ts)
  *       Why: Protect routes that require authentication (appointments, doctors, getProfile)
  *       Note: register() and login() stay public - middleware is for OTHER routes
  *
@@ -115,7 +118,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     console.log("✅ Validation passed for:", email);
 
     // ============================================================
-    // NEXT STEP: Call Supabase (we'll add this in the next step)
+    // IMPLEMENTATION STEP: Replace this placeholder by calling Supabase
     // ============================================================
     // NOTE: 501 = "Not Implemented" - perfect for placeholder endpoints
     // NOTE: JSON keys are flexible - could be "msg", "info", "status", etc.

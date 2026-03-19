@@ -28,7 +28,7 @@
  * ✅ 6. Review and understand the register() function below
  *       Why: Learn how validation works, status codes, and error handling before implementing the Supabase call
  *
- * ⬜ 7. Implement the Supabase call inside register()
+ * ✅ 7. Implement the Supabase call inside register()
  *       Why: Actually create the user, get the session token, and move beyond the placeholder response
  *
  * ⬜ 8. Implement the login() function below
@@ -118,13 +118,112 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     console.log("✅ Validation passed for:", email);
 
     // ============================================================
-    // IMPLEMENTATION STEP: Replace this placeholder by calling Supabase
+    // STEP 5: SANITIZE THE ROLE VALUE
     // ============================================================
-    // NOTE: 501 = "Not Implemented" - perfect for placeholder endpoints
-    // NOTE: JSON keys are flexible - could be "msg", "info", "status", etc.
-    res.status(501).json({
-      message: "Registration endpoint - validation works! Next: call Supabase",
-      receivedData: { email, name, role: role || "patient" },
+    // We only allow two roles: "patient" or "doctor"
+    // If the frontend sends anything else (or nothing), we default to "patient"
+    // This prevents someone from sending role: "admin" and getting elevated access
+    const userRole = role === "doctor" ? "doctor" : "patient";
+
+    // ============================================================
+    // STEP 6: CALL SUPABASE TO CREATE THE USER
+    // ============================================================
+    // supabase.auth.signUp() does three things for us:
+    //   1. Creates a new user in Supabase's auth system (stores email + hashed password)
+    //   2. Stores any extra info we pass in "options.data" as user_metadata
+    //   3. Returns { data, error } - we always get one or the other
+    //
+    // NOTE: We are NOT storing the password ourselves - Supabase handles that securely
+    // NOTE: options.data = extra profile info attached to the user (not the password)
+    const { data, error } = await supabase.auth.signUp({
+      email,       // ← we are SENDING this TO Supabase
+      password,    // ← we are SENDING this TO Supabase
+      options: {
+        data: {    // ← this inner "data" is also sent TO Supabase (metadata)
+          name,
+          role: userRole,
+        },
+      },
+    });
+
+    // ============================================================
+    // STEP 7: HANDLE SUPABASE ERRORS
+    // ============================================================
+    // If Supabase returned an error (e.g. email already registered,
+    // password too short according to Supabase settings, etc.)
+    // we send a 400 response back to the frontend with the error message
+    if (error) {
+      console.error("❌ Supabase sign-up error:", error.message);
+      res.status(400).json({
+        error: "Registration failed",
+        message: error.message, // e.g. "User already registered"
+      });
+      return;
+    }
+
+    // ============================================================
+    // STEP 8: HANDLE THE CASE WHERE NO USER WAS CREATED
+    // ============================================================
+    // This is a rare edge case - Supabase returned no error but also no user
+    // We treat this as an unexpected server problem (500 = our fault, not client's)
+    if (!data.user) {
+      console.error("❌ Supabase returned no user and no error");
+      res.status(500).json({
+        error: "Server error",
+        message: "Something went wrong. Please try again.",
+      });
+      return;
+    }
+
+    // ============================================================
+    // STEP 9: SET THE AUTH COOKIE (IF SUPABASE GAVE US A SESSION)
+    // ============================================================
+    // After sign-up, Supabase may or may not return a session immediately:
+    //
+    //   - If email confirmation is DISABLED → session is returned right away
+    //     → We set the cookie so the user is logged in immediately
+    //
+    //   - If email confirmation is ENABLED → session is null (user must verify email first)
+    //     → We skip setting the cookie for now
+    //
+    // The cookie stores the JWT token SECURELY:
+    //   httpOnly: true   → JavaScript cannot read this cookie (prevents XSS attacks)
+    //   secure: true     → Only sent over HTTPS in production (not needed in dev)
+    //   sameSite: "lax"  → Protects against CSRF attacks
+    //   maxAge           → Cookie expires after 1 hour (1000ms × 60s × 60m)
+    if (data.session?.access_token) {
+      res.cookie("auth-token", data.session.access_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 1000 * 60 * 60, // 1 hour in milliseconds
+      });
+      console.log("✅ Auth cookie set for:", email);
+    }
+
+    // ============================================================
+    // STEP 10: SEND SUCCESS RESPONSE TO FRONTEND
+    // ============================================================
+    // We send back:
+    //   - A message explaining what happened
+    //   - Safe user info (id, email, name, role) that the frontend can use
+    //
+    // We do NOT send back:
+    //   - The password (never!)
+    //   - The raw JWT token in the JSON body (it's in the cookie instead)
+    //
+    // 201 = "Created" - the standard status code for successfully creating a resource
+    console.log("✅ User registered successfully:", email);
+    res.status(201).json({
+      message: data.session
+        ? "Registration successful! You are now logged in."
+        : "Registration successful! Please check your email to verify your account.",
+      user: {
+        id: data.user.id,           // Supabase-generated unique user ID
+        email: data.user.email,     // The email they registered with
+        name: data.user.user_metadata.name,   // From options.data above
+        role: data.user.user_metadata.role,   // From options.data above
+      },
     });
   } catch (error) {
     // ============================================================

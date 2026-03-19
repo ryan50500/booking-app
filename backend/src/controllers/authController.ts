@@ -31,11 +31,8 @@
  * ✅ 7. Implement the Supabase call inside register()
  *       Why: Actually create the user, get the session token, and move beyond the placeholder response
  *
- * ⬜ 8. Implement the login() function below
- *       Why: Let existing users sign in (verifies credentials, sets cookie)
- *
- * ⬜ 9. Test register() with curl (no Postman needed)
- *       Why: Verify the Supabase call works before building login()
+ * ⬜ 8. Test register() with curl (no Postman needed)
+ *       Why: Verify register() works before building login() on top of it
  *
  *       Step 1 - Start the backend server (in terminal):
  *         cd /workspaces/booking-app/backend && npm run dev
@@ -49,6 +46,9 @@
  *         { "message": "Registration successful! You are now logged in.", "user": { ... } }
  *
  *       Also check: Supabase Dashboard → Authentication → Users → confirm user appeared there
+ *
+ * ⬜ 9. Implement the login() function below
+ *       Why: Let existing users sign in (verifies credentials, sets cookie)
  *
  * ⬜ 10. Implement getProfile() function
  *       Why: Let logged-in users fetch their account info

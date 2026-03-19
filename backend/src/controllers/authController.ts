@@ -34,8 +34,21 @@
  * ⬜ 8. Implement the login() function below
  *       Why: Let existing users sign in (verifies credentials, sets cookie)
  *
- * ⬜ 9. Test with Postman or your frontend
- *       Why: Verify register/login work before building more features
+ * ⬜ 9. Test register() with curl (no Postman needed)
+ *       Why: Verify the Supabase call works before building login()
+ *
+ *       Step 1 - Start the backend server (in terminal):
+ *         cd /workspaces/booking-app/backend && npm run dev
+ *
+ *       Step 2 - Send a test registration request (in a second terminal):
+ *         curl -X POST http://localhost:5000/api/auth/register \
+ *           -H "Content-Type: application/json" \
+ *           -d '{"email": "test@example.com", "password": "password123", "name": "Test User", "role": "patient"}'
+ *
+ *       Expected response:
+ *         { "message": "Registration successful! You are now logged in.", "user": { ... } }
+ *
+ *       Also check: Supabase Dashboard → Authentication → Users → confirm user appeared there
  *
  * ⬜ 10. Implement getProfile() function
  *       Why: Let logged-in users fetch their account info

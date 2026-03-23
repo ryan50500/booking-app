@@ -5,7 +5,6 @@ export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: '/api',
     prepareHeaders: (headers, { getState }) => {
-      // Add authentication token to headers when available
       const token = (getState() as any).auth.token;
       if (token) {
         headers.set('authorization', `Bearer ${token}`);
@@ -13,6 +12,6 @@ export const apiSlice = createApi({
       return headers;
     },
   }),
-  tagTypes: ['User', 'Doctor', 'Appointment'],
+  tagTypes: ['User', 'Application', 'PrepNote'],
   endpoints: () => ({}),
 });

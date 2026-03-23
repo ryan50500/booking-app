@@ -7,43 +7,43 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <span className="text-2xl font-bold text-primary-600">
-                HealthCare+
+              <span className="text-2xl font-bold text-indigo-600">
+                JobTrack
               </span>
             </Link>
           </div>
 
           <div className="hidden md:flex items-center space-x-8">
             <Link
-              to="/"
-              className="text-gray-700 hover:text-primary-600 transition-colors"
+              to="/dashboard"
+              className="text-gray-700 hover:text-indigo-600 transition-colors"
             >
-              Home
+              Dashboard
             </Link>
             <Link
-              to="/doctors"
-              className="text-gray-700 hover:text-primary-600 transition-colors"
+              to="/applications"
+              className="text-gray-700 hover:text-indigo-600 transition-colors"
             >
-              Find Doctors
+              Applications
             </Link>
             <Link
-              to="/appointments"
-              className="text-gray-700 hover:text-primary-600 transition-colors"
+              to="/prep-notes"
+              className="text-gray-700 hover:text-indigo-600 transition-colors"
             >
-              Appointments
+              Interview Prep
             </Link>
           </div>
 
           <div className="flex items-center space-x-4">
             <Link
               to="/login"
-              className="text-gray-700 hover:text-primary-600 transition-colors"
+              className="text-gray-700 hover:text-indigo-600 transition-colors"
             >
               Login
             </Link>
             <Link
               to="/register"
-              className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+              className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
             >
               Sign Up
             </Link>

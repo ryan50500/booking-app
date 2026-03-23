@@ -1,101 +1,70 @@
+import { Link } from 'react-router-dom';
+
+const statusColors: Record<string, string> = {
+  applied: 'bg-blue-100 text-blue-800',
+  screening: 'bg-yellow-100 text-yellow-800',
+  interview: 'bg-purple-100 text-purple-800',
+  offer: 'bg-green-100 text-green-800',
+  rejected: 'bg-red-100 text-red-800',
+  withdrawn: 'bg-gray-100 text-gray-800',
+};
+
 const DashboardPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">Dashboard</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
+          <Link
+            to="/applications"
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+          >
+            + Add Application
+          </Link>
+        </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm">Total Appointments</p>
-                <p className="text-3xl font-bold text-gray-800 mt-2">12</p>
-              </div>
-              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-            </div>
+            <p className="text-gray-500 text-sm">Total Applied</p>
+            <p className="text-3xl font-bold text-gray-800 mt-1">0</p>
           </div>
-
           <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm">Upcoming</p>
-                <p className="text-3xl font-bold text-gray-800 mt-2">3</p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
+            <p className="text-yellow-600 text-sm">In Progress</p>
+            <p className="text-3xl font-bold text-gray-800 mt-1">0</p>
           </div>
-
           <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm">Completed</p>
-                <p className="text-3xl font-bold text-gray-800 mt-2">9</p>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
+            <p className="text-purple-600 text-sm">Interviews</p>
+            <p className="text-3xl font-bold text-gray-800 mt-1">0</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <p className="text-green-600 text-sm">Offers</p>
+            <p className="text-3xl font-bold text-gray-800 mt-1">0</p>
           </div>
         </div>
 
-        {/* Recent Appointments */}
+        {/* Quick Links */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <Link to="/applications" className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow block">
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Job Applications</h2>
+            <p className="text-gray-600">Track every application, status, and recruiter contact</p>
+          </Link>
+          <Link to="/prep-notes" className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow block">
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Interview Prep</h2>
+            <p className="text-gray-600">Your personal Q&amp;A library — search before any interview</p>
+          </Link>
+        </div>
+
+        {/* Recent Applications placeholder */}
         <div className="bg-white rounded-lg shadow-md">
           <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-800">Recent Appointments</h2>
+            <h2 className="text-xl font-semibold text-gray-800">Recent Applications</h2>
           </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              {/* Placeholder appointment cards */}
-              <div className="border border-gray-200 rounded-lg p-4 hover:border-primary-300 transition-colors">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-semibold text-gray-800">Dr. Sarah Johnson</h3>
-                    <p className="text-gray-600 text-sm">Cardiology</p>
-                    <p className="text-gray-500 text-sm mt-2">Dec 25, 2024 at 10:00 AM</p>
-                  </div>
-                  <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                    Confirmed
-                  </span>
-                </div>
-              </div>
-
-              <div className="border border-gray-200 rounded-lg p-4 hover:border-primary-300 transition-colors">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-semibold text-gray-800">Dr. Michael Chen</h3>
-                    <p className="text-gray-600 text-sm">Dermatology</p>
-                    <p className="text-gray-500 text-sm mt-2">Dec 28, 2024 at 2:30 PM</p>
-                  </div>
-                  <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full">
-                    Pending
-                  </span>
-                </div>
-              </div>
-
-              <div className="border border-gray-200 rounded-lg p-4 hover:border-primary-300 transition-colors">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-semibold text-gray-800">Dr. Emily Davis</h3>
-                    <p className="text-gray-600 text-sm">Pediatrics</p>
-                    <p className="text-gray-500 text-sm mt-2">Dec 30, 2024 at 11:00 AM</p>
-                  </div>
-                  <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                    Confirmed
-                  </span>
-                </div>
-              </div>
-            </div>
+          <div className="p-6 text-center text-gray-500">
+            <p>No applications yet.</p>
+            <Link to="/applications" className="text-indigo-600 hover:underline mt-2 inline-block">
+              Add your first application →
+            </Link>
           </div>
         </div>
       </div>

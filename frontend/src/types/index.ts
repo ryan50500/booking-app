@@ -2,49 +2,53 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'patient' | 'doctor' | 'admin';
-  phone?: string;
-  dateOfBirth?: string;
-  address?: string;
   createdAt: string;
-  updatedAt: string;
 }
 
-export interface Doctor {
+export type ApplicationStatus =
+  | 'applied'
+  | 'screening'
+  | 'interview'
+  | 'offer'
+  | 'rejected'
+  | 'withdrawn';
+
+export type ApplicationSource =
+  | 'linkedin'
+  | 'company_site'
+  | 'referral'
+  | 'recruiter'
+  | 'other';
+
+export type InterestLevel = 'high' | 'medium' | 'low';
+
+export interface Application {
   id: string;
-  userId: string;
-  name: string;
-  email: string;
-  specialization: string;
-  qualifications: string[];
-  experience: number;
-  consultationFee: number;
-  availableSlots: TimeSlot[];
-  rating?: number;
-  bio?: string;
-  profileImage?: string;
+  user_id: string;
+  company: string;
+  role: string;
+  job_url?: string;
+  source: ApplicationSource;
+  status: ApplicationStatus;
+  interest_level?: InterestLevel;
+  salary_range?: string;
+  interview_stage?: number;  // which round: 1, 2, 3...
+  applied_date: string;
+  notes?: string;            // per-application notes (NOT the general prep notes)
+  contact_name?: string;
+  contact_email?: string;
+  created_at: string;
+  updated_at: string;
 }
 
-export interface TimeSlot {
-  day: string;
-  startTime: string;
-  endTime: string;
-  isAvailable: boolean;
-}
-
-export interface Appointment {
+export interface PrepNote {
   id: string;
-  patientId: string;
-  patientName: string;
-  doctorId: string;
-  doctorName: string;
-  appointmentDate: string;
-  timeSlot: string;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
-  reasonForVisit?: string;
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
+  user_id: string;
+  question: string;
+  answer: string;
+  category: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface LoginCredentials {
@@ -56,7 +60,4 @@ export interface RegisterData {
   name: string;
   email: string;
   password: string;
-  phone?: string;
-  dateOfBirth?: string;
-  role?: 'patient' | 'doctor';
 }

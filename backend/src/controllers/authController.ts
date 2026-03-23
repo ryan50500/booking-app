@@ -40,7 +40,7 @@
  *       Step 2 - Send a test registration request (in a second terminal):
  *         curl -X POST http://localhost:5000/api/auth/register \
  *           -H "Content-Type: application/json" \
- *           -d '{"email": "test@example.com", "password": "password123", "name": "Test User", "role": "patient"}'
+ *           -d '{"email": "test@example.com", "password": "password123", "name": "Test User"}'
  *
  *       Expected response:
  *         { "message": "Registration successful! You are now logged in.", "user": { ... } }
@@ -57,7 +57,7 @@
  *       Why: Add secure flags (HTTPS-only, strict SameSite) for deployed app
  *
  * ⬜ 12. Implement auth middleware (middleware/auth.ts)
- *       Why: Protect routes that require authentication (appointments, doctors, getProfile)
+ *       Why: Protect routes that require authentication (applications, prep-notes, getProfile)
  *       Note: register() and login() stay public - middleware is for OTHER routes
  *
  * ============================================================================
@@ -85,7 +85,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // ============================================================
     // STEP 1: EXTRACT DATA FROM REQUEST BODY
     // ============================================================
-    const { email, password, name, role } = req.body;
+    const { email, password, name } = req.body;
 
     // ============================================================
     // STEP 2: VALIDATE REQUIRED FIELDS
@@ -131,15 +131,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     console.log("✅ Validation passed for:", email);
 
     // ============================================================
-    // STEP 5: SANITIZE THE ROLE VALUE
-    // ============================================================
-    // We only allow two roles: "patient" or "doctor"
-    // If the frontend sends anything else (or nothing), we default to "patient"
-    // This prevents someone from sending role: "admin" and getting elevated access
-    const userRole = role === "doctor" ? "doctor" : "patient";
-
-    // ============================================================
-    // STEP 6: CALL SUPABASE TO CREATE THE USER
+    // STEP 5: CALL SUPABASE TO CREATE THE USER
     // ============================================================
     // supabase.auth.signUp() does three things for us:
     //   1. Creates a new user in Supabase's auth system (stores email + hashed password)
@@ -149,13 +141,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // NOTE: We are NOT storing the password ourselves - Supabase handles that securely
     // NOTE: options.data = extra profile info attached to the user (not the password)
     const { data, error } = await supabase.auth.signUp({
-      email,       // ← we are SENDING this TO Supabase
-      password,    // ← we are SENDING this TO Supabase
+      email,
+      password,
       options: {
-        data: {    // ← this inner "data" is also sent TO Supabase (metadata)
-          name,
-          role: userRole,
-        },
+        data: { name },
       },
     });
 
@@ -219,7 +208,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // ============================================================
     // We send back:
     //   - A message explaining what happened
-    //   - Safe user info (id, email, name, role) that the frontend can use
+    //   - Safe user info (id, email, name) that the frontend can use
     //
     // We do NOT send back:
     //   - The password (never!)
@@ -232,10 +221,9 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         ? "Registration successful! You are now logged in."
         : "Registration successful! Please check your email to verify your account.",
       user: {
-        id: data.user.id,           // Supabase-generated unique user ID
-        email: data.user.email,     // The email they registered with
-        name: data.user.user_metadata.name,   // From options.data above
-        role: data.user.user_metadata.role,   // From options.data above
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.user_metadata.name,
       },
     });
   } catch (error) {

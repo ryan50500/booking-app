@@ -1,24 +1,32 @@
-# Doctor Booking App - HealthCare+
+# Job Tracker
 
-A full-stack doctor booking application where patients can log in and book GP appointments.
+A full-stack job application tracker that helps you manage your job search — track applications, monitor progress through different hiring stages, and store interview prep notes.
+
+## Features
+
+- **Application Tracking** — Log job applications with company, role, status, source, salary range, and contact details
+- **Status Pipeline** — Track progress through applied → screening → interview → offer / rejected / withdrawn
+- **Interview Prep Notes** — Store question-and-answer pairs organised by category (e.g. React, Behavioural, System Design)
+- **Authentication** — Secure register/login/logout with HTTP-only cookie sessions via Supabase Auth
 
 ## Tech Stack
 
 ### Frontend
-- **Vite** - Build tool
-- **React 18** - UI library
-- **TypeScript** - Type safety
-- **Redux Toolkit** - State management
-- **RTK Query** - Data fetching and caching
-- **React Router** - Navigation
-- **TailwindCSS** - Styling
+- **Vite** — Build tool
+- **React 18** — UI library
+- **TypeScript** — Type safety
+- **Redux Toolkit** — State management
+- **Axios** — HTTP client
+- **React Router v6** — Navigation
+- **TailwindCSS** — Styling
 
 ### Backend
-- **Node.js** - Runtime environment
-- **Express** - Web framework
-- **TypeScript** - Type safety
-- **MongoDB** - Database
-- **Mongoose** - ODM
+- **Node.js** — Runtime environment
+- **Express** — Web framework
+- **TypeScript** — Type safety
+- **Supabase** — PostgreSQL database + Auth
+- **Cookie Parser** — HTTP-only cookie sessions
+- **CORS** — Cross-origin request handling
 
 ## Project Structure
 
@@ -26,30 +34,27 @@ A full-stack doctor booking application where patients can log in and book GP ap
 booking-app/
 ├── backend/
 │   ├── src/
-│   │   ├── config/         # Configuration files
+│   │   ├── config/         # Supabase client setup
 │   │   ├── controllers/    # Route controllers
-│   │   ├── middleware/     # Custom middleware
-│   │   ├── models/         # Database models
+│   │   ├── middleware/     # Auth middleware
+│   │   ├── models/         # Data model types
 │   │   ├── routes/         # API routes
-│   │   ├── utils/          # Utility functions
 │   │   └── server.ts       # Entry point
-│   ├── tests/              # Test files
 │   ├── package.json
 │   └── tsconfig.json
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── assets/         # Images, styles, etc.
-│   │   ├── components/     # Reusable components
+│   │   ├── assets/         # Styles
+│   │   ├── components/     # Reusable components (Navbar, Footer, Layout)
 │   │   ├── pages/          # Page components
-│   │   ├── services/       # API services (RTK Query)
+│   │   ├── services/       # API service layer
 │   │   ├── store/          # Redux store and slices
 │   │   ├── types/          # TypeScript types
-│   │   ├── utils/          # Utility functions
 │   │   ├── App.tsx         # App component
 │   │   └── main.tsx        # Entry point
 │   ├── public/             # Static files
-│   ├── index.html          # HTML template
+│   ├── index.html
 │   ├── package.json
 │   ├── tsconfig.json
 │   ├── vite.config.ts
@@ -58,12 +63,31 @@ booking-app/
 └── README.md
 ```
 
+## API Endpoints
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/auth/register` | Register a new user | No |
+| POST | `/api/auth/login` | Login | No |
+| POST | `/api/auth/logout` | Logout | Yes |
+| GET | `/api/applications` | Get all user applications | Yes |
+| POST | `/api/applications` | Create an application | Yes |
+| GET | `/api/applications/:id` | Get a specific application | Yes |
+| PUT | `/api/applications/:id` | Update an application | Yes |
+| DELETE | `/api/applications/:id` | Delete an application | Yes |
+| GET | `/api/prep-notes` | Get all prep notes | Yes |
+| POST | `/api/prep-notes` | Create a prep note | Yes |
+| GET | `/api/prep-notes/:id` | Get a specific prep note | Yes |
+| PUT | `/api/prep-notes/:id` | Update a prep note | Yes |
+| DELETE | `/api/prep-notes/:id` | Delete a prep note | Yes |
+| GET | `/health` | Health check | No |
+
 ## Getting Started
 
 ### Prerequisites
 - Node.js (v18 or higher)
-- npm or yarn
-- MongoDB (local or cloud instance)
+- npm
+- A [Supabase](https://supabase.com) project (free tier works)
 
 ### Backend Setup
 
@@ -77,25 +101,23 @@ cd backend
 npm install
 ```
 
-3. Create a `.env` file based on `.env.example`:
-```bash
-cp .env.example .env
-```
-
-4. Update the `.env` file with your configuration:
+3. Create a `.env` file:
 ```env
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/booking-app
-JWT_SECRET=your_jwt_secret_key_here
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+FRONTEND_URL=http://localhost:5173
 NODE_ENV=development
 ```
 
-5. Start the development server:
+> **Note:** Use your project's **service role key** (not the anon key) so the backend can bypass Row Level Security.
+
+4. Start the development server:
 ```bash
 npm run dev
 ```
 
-The backend server will run on `http://localhost:5000`
+The backend will run on `http://localhost:5000`.
 
 ### Frontend Setup
 
@@ -114,59 +136,34 @@ npm install
 npm run dev
 ```
 
-The frontend application will run on `http://localhost:3000`
+The frontend will run on `http://localhost:5173`.
 
 ## Available Scripts
 
 ### Backend
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm test` - Run tests
-- `npm run lint` - Run linter
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server with nodemon |
+| `npm run build` | Compile TypeScript |
+| `npm start` | Run compiled production build |
 
 ### Frontend
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm test` - Run tests
-- `npm run lint` - Run linter
-
-## Features (To be implemented)
-
-- [ ] User authentication (patients and doctors)
-- [ ] Patient registration and login
-- [ ] Browse doctors by specialization
-- [ ] View doctor profiles and availability
-- [ ] Book appointments
-- [ ] View and manage appointments
-- [ ] Cancel/reschedule appointments
-- [ ] Dashboard for patients
-- [ ] Dashboard for doctors
-- [ ] Admin panel
-
-## Current Status
-
-✅ Basic project structure created
-✅ Frontend UI pages designed (HTML/CSS only)
-✅ Redux store structure set up
-✅ Backend folder structure created
-✅ TypeScript configuration
-✅ TailwindCSS integration
-
-⏳ Authentication - To be implemented
-⏳ API endpoints - To be implemented
-⏳ Database integration - To be implemented
-⏳ Testing - To be implemented
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Vite development server |
+| `npm run build` | Build for production |
+| `npm run preview` | Preview production build |
+| `npm run lint` | Run ESLint |
+| `npm test` | Run Jest tests |
 
 ## Pages
 
-- **Home** - Landing page with features and CTAs
-- **Login** - User login page
-- **Register** - New user registration
-- **Dashboard** - User dashboard with appointment stats
-- **Doctors** - Browse and search doctors
-- **Appointments** - View and manage appointments
+- **Home** — Landing page
+- **Login** — User login
+- **Register** — New user registration
+- **Dashboard** — Overview of your job search activity
+- **Applications** — View, add, and manage job applications
+- **Prep Notes** — Manage interview preparation Q&A by category
 
 ## License
 
